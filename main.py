@@ -15,7 +15,6 @@ no clock: two runs produce byte-identical output.
 import math
 import os
 import struct
-import sys
 import zlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -535,7 +534,7 @@ def page_frame(cv, x0, y0, w, h):
                 alpha=9)
 
 
-def field(cv, x, y, label, value, vfont="sans_15", label_w=None):
+def field(cv, x, y, label, value, vfont="sans_15"):
     cv.draw_text(FONTS["sans_bold_11"], x, y, label, NAVY_SOFT, tracking=1)
     cv.draw_text(FONTS[vfont], x, y + 19, value, INK)
 
