@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """Passport of the Republic of Nordhavn -- a country that isn't there.
 
 Generates one open passport spread (data page + visa page) and writes it to
@@ -488,8 +489,11 @@ def draw_fee_stamp(cv, cx, cy, r):
     ink = (122, 92, 30)
     cv.circle(cx, cy, r, ink, fill=False, t=2)
     cv.circle(cx, cy, r - 5, ink, fill=False, t=1)
+    # NOTE: the top arc must stay short. "HAVNVIK HARBOURMASTER" is 194 px
+    # wide, a 252-degree span at this radius: it wrapped around the sides
+    # and struck through "02 MAY 2023". "HAVNVIK" spans ~83 degrees.
     circular_text(cv, FONTS["sans_bold_11"], cx, cy, r - 12,
-                  "HAVNVIK HARBOURMASTER", ink, start_deg=270)
+                  "HAVNVIK", ink, start_deg=270)
     circular_text(cv, FONTS["sans_bold_11"], cx, cy, r - 12,
                   "FEE PAID", ink, start_deg=90, direction=-1)
     cv.text_centered(FONTS["sans_bold_16"], cx, cy - 2, "120 KR", ink)
@@ -505,7 +509,12 @@ def draw_visa_sticker(cv, x, y, w, h, angle):
     st.text_centered(FONTS["sans_bold_16"], w // 2, 52, "AUSTERLAND", INK)
     st.text_centered(FONTS["sans_13"], w // 2, 72, "SINGLE ENTRY — 30 DAYS", INK)
     st.text_centered(FONTS["sans_13"], w // 2, 90, "No. AV-2210-884", INK)
-    blit_stamp(cv, st, x, y, angle, alpha=255)
+    # NOTE: do NOT use blit_stamp here. It transfers only dark pixels, so
+    # the white VISA text on the green header came out as a faint ghost
+    # outline (only anti-aliased edges survived). A visa sticker is a solid
+    # printed label, so paste the whole rotated sticker opaquely.
+    rc = st.rotated(angle)
+    cv.blit_canvas(rc, x, y)
 
 
 # -------------------------------------------------------------- pages ------
